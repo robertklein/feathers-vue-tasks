@@ -1,15 +1,19 @@
-FROM keymetrics/pm2:10-alpine
+FROM node:12.8.1-alpine
 
-COPY src src/
-COPY public public/
-COPY package.json .
-COPY pm2.json .
+# Create app directory
+WORKDIR /home/node/api
 
 # Install app dependencies
-ENV NPM_CONFIG_LOGLEVEL warn
-RUN npm install --production
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY package*.json ./
 
-# Show current folder structure in logs
-RUN ls -al -R
+RUN npm install
+# If you are building your code for production
+# RUN npm ci --only=production
 
-CMD [ "pm2-runtime", "start", "pm2.json" ]
+# Bundle app source
+COPY . .
+
+EXPOSE 3030
+CMD [ "npm", "run", "dev" ]
